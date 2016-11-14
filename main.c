@@ -3,7 +3,7 @@ Projeto de PDS Grupo 3
 Membros:
 	Guilherme Marques Moreira da Silva	
 	Gustavo Cavalcante Linhares
-	Gustavo
+	Gustavo Carvalho
 */
 //Includes
 #include <stdio.h>
