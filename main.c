@@ -19,6 +19,12 @@ Membros:
 
 //Structs
 
+//Structs para Filmes
+
+typedef struct{
+	
+}Filmes;
+
 //Structs para salas de cinema
 typedef struct{
 	
