@@ -2,7 +2,7 @@
 Projeto de PDS Grupo 3
 Membros:
 	Guilherme Marques Moreira da Silva	
-	Gustavo 
+	Gustavo Cavalcante Linhares
 	Gustavo
 */
 //Includes
@@ -19,6 +19,10 @@ Membros:
 
 //Structs
 
+//Structs para salas de cinema
+typedef struct{
+	
+}Salas;
 //Struct para atores
 typedef struct{
 	char nome[ATORMAXNOME];
@@ -40,7 +44,7 @@ int main()
 	int validaOpcaoMain(int opcao);
 	
 	//Instruções
-	setlocale(SET_ALL, "");
+	setlocale(LC_ALL, "");
 	
 	do
 	{
