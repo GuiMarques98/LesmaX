@@ -40,7 +40,7 @@ typedef struct{
 }Atores;
 
 //Cabeçalhos
-
+void menuAtores();
 
 //Principal
 int main()
@@ -57,7 +57,7 @@ int main()
 		printf("PRINCIPAL\n______________________________________________________________________\n\n");
 		do
 		{
-			printf("\nEscolha o menu que deseja entrar:\n1-Filmes\n2-Salas de Cinema\n3-Atores\nInsira a opção:");
+			printf("\nEscolha o menu que deseja entrar:\n1-Filmes\n2-Salas de Cinema\n3-Atores\n0-Para encerrar o programa\nInsira a opção:");
 			opcao = getch();
 			
 		}while(!validaOpcaoMain(opcao));
@@ -72,11 +72,11 @@ int main()
 				
 				break;
 			case '3':
-				
+				menuAtores();
 				break;
 		}
-		
-	}while(opcao != 0);
+		system("cls");
+	}while(opcao != '0');
 	
     return 0;
 }
@@ -90,7 +90,7 @@ int validaOpcaoMain(int opcao)
 {
 	//Instruções 
 	
-	if(toupper(opcao) != 83 && toupper(opcao) != 78)
+	if(opcao < 48 || opcao > 51)
 	{
 		printf("Opção inválida!\n");
 		return 0;
@@ -102,7 +102,26 @@ int validaOpcaoMain(int opcao)
 }
 
 //====================================ATORES=========================================
+//===============MENU=====================
+//Objetivo : 
+//Parametro: 
+//Retorno  : 
+void menuAtores()
+{
+	//Declarações
+	FILE *arq_atores;
+	const char nome_arq_atores[] = "atores.bin";
+	char opcao;
+	
+	//Instruções
+	
+	
+	
+}
 
+//Objetivo : 
+//Parametro: 
+//Retorno  : 
 
 //===================================FILMES==========================================
 
