@@ -50,6 +50,7 @@ void leNacionalidadeAtores(char *nacionalidade);
 void imprimeMenusAtores(char tipo);
 int temMatriculaIgualAtor(int matricula, const char *nome_arq);
 int achaNroAtores(const char *arq_nome);
+void imprimeProfissaoAtor(int profissao);
 
 
 //USEM ESSAS DUAS FUNÇÕES PRA ABRIR E FECHAR O ARQUIVO
@@ -191,15 +192,19 @@ void mainAtores()
 		{
 			case'1':
 				cadastraAtores(nome_arq_atores);
+				system("cls");
 				break;
 			case '2':
-				//editaAtores(nome_arq_atores);
+				editaAtores(nome_arq_atores);
+				system("cls");
 				break;
 			case '3':
 				//listaAtores(nome_arq_atores);
+				system("cls");
 				break;
 			//case '4':
 				//deletaAtores(nome_arq_atores);
+				system("cls");
 		}
 	}while(opcao != '0');
 	
@@ -382,17 +387,13 @@ int leMatriculaAtores(const char *arq_nome_atores)
 void editaAtores(const char *arq_nome_atores)
 {
 	//Declarações Funções
-	void editaAtoresNome(const char *arq_nome_atores);
-	void editaAtoresIdade(const char *arq_nome_atores);
-	void editaAtoresProfissao(const char *arq_nome_atores);
-	void editaAtoresFilmesFeitos(const char *arq_nome_atores);
-	void editaAtoresNacionalidade(const char *arq_nome_atores);
 	int validaOpcaoAtoresEdita(int opcao);
 	
 	//Declaração Variaveis
 	FILE *arq_atores;
 	char opcao;
-	int matricula = 0, aux = 0;
+	Atores ator;
+	int matricula = 0, aux = 0, contador = 0, valida = 0;
 	
 	//Instruções
 	imprimeMenusAtores('e');
@@ -409,25 +410,54 @@ void editaAtores(const char *arq_nome_atores)
 	system("cls");
 	
 	imprimeMenusAtores('e');
-	do
-	{
-		printf("Digite a opção que deseja editar:\n1-")
-		opcao = getch();
-	}while(!validaOpcaoAtoresEdita(opcao));
+	
 	
 	while(!contador)
 	{
-		arqCamara = abreArquivo("rb", nomeArq);
-		fseek(arqCamara, (aux * sizeof(parlamentar)), SEEK_SET);
-		fread(&deputado, sizeof(parlamentar), 1, arqCamara);
-		contador = feof(arqCamara);
-		if(deputado.matricula == matricula)
+		arq_atores = abreArquivo("rb", arq_nome_atores);
+		fseek(arq_atores, (aux * sizeof(Atores)), SEEK_SET);
+		fread(&ator, sizeof(Atores), 1, arq_atores);
+		contador = feof(arq_atores);
+		
+		if(ator.matricula == matricula)
 		{
-			leNome(deputado.nome);
-			arqCamara = abreArquivo("r+b", nomeArq);
-			fseek(arqCamara, ((aux) * sizeof(parlamentar)), SEEK_SET);
-			fwrite(&deputado, sizeof(parlamentar), 1, arqCamara);
-			fechaArquivo(arqCamara);
+			printf("1-NOME: %s\n2-IDADE: %d\n3-PROFISSÃO:");
+			imprimeProfissaoAtor(ator.profissao);
+			printf("\n4-FILMES FEITOS: %s\n5-NACIONALIDADE: %s\n0-VOLTAR AO MENU PRINCIPAL\n");
+			
+			do
+			{
+				printf("Digite a opção que deseja editar:");
+				opcao = getch();
+			}while(!validaOpcaoAtoresEdita(opcao));
+			
+			switch(opcao)
+			{
+				case '1':
+					leNomeAtores(ator.nome);
+					break;
+				case '2':
+					ator.idade = leIdadeAtores();
+					break;
+				case '3':
+					ator.profissao = leProfissaoAtores();
+					break;
+				case '4':
+					leFilmesFeitosAtores(ator.filmes_feitos);
+					break;
+				case '5':
+					leNacionalidadeAtores(ator.nacionalidade);
+					break;
+				case '0':
+					return;
+			}
+			
+			arq_atores = abreArquivo("r+b", arq_nome_atores);
+			fseek(arq_atores, ((aux) * sizeof(Atores)), SEEK_SET);
+			fwrite(&ator, sizeof(Atores), 1, arq_atores);
+			fechaArquivo(arq_atores);
+			printf("\n\nAtor editado com sucesso!\n\n");
+			system("pause");
 			return;
 		}
 		else
@@ -438,40 +468,6 @@ void editaAtores(const char *arq_nome_atores)
 	
 }
 
-//Objetivo : 
-//Parametro: 
-//Retorno  : 
-void editaAtoresNome(const char *arq_nome_atores)
-{
-}
-
-//Objetivo : 
-//Parametro: 
-//Retorno  : 
-void editaAtoresIdade(const char *arq_nome_atores)
-{
-}
-
-//Objetivo : 
-//Parametro: 
-//Retorno  : 
-void editaAtoresProfissao(const char *arq_nome_atores)
-{
-}
-
-//Objetivo : 
-//Parametro: 
-//Retorno  : 
-void editaAtoresFilmesFeitos(const char *arq_nome_atores)
-{
-}
-
-//Objetivo : 
-//Parametro: 
-//Retorno  : 
-void editaAtoresNacionalidade(const char *arq_nome_atores)
-{
-}
 
 //Objetivo : 
 //Parametro: 
@@ -568,6 +564,29 @@ int achaNroAtores(const char *arq_nome)
 }
 
 
+//Objetivo : Imprime na tela a profissão do ator
+//Parametro: Profissão do ator
+//Retorno  : Sem retorno
+void imprimeProfissaoAtor(int profissao)
+{
+	switch(profissao)
+	{
+		case '1':
+			printf("Ator");
+			return;
+		case '2':
+			printf("Diretor");
+			return;
+		case '3':
+			printf("Roteirista");
+			return;
+		case '4':
+			printf("Produtor");
+			return;
+		
+	}
+}
+
 //Objetivo : 
 //Parametro: 
 //Retorno  : 
@@ -630,6 +649,22 @@ int validaMatricula(const char *arq_nome_atores, int matricula)
 		return 1;
 	}
 	
+}
+
+//Objetivo : Valida a opção do menu atores editar
+//Parametro: Opção
+//Retorno  : Situação da Validação
+int validaOpcaoAtoresEdita(int opcao)
+{
+	if(opcao < 48 || opcao > 53)
+	{
+		printf("Opção inválida! ");
+		return 0;
+	}
+	else 
+	{
+		return 1;
+	}
 }
 
 //Objetivo : 
