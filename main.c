@@ -286,9 +286,9 @@ void leNomeAtores(char* nome)
 		fflush(stdin);
 		fgets(nome, ATORMAXNOME, stdin);
 		nome[strlen(nome)-1] = '\0';
-		if(strlen(nome) < 3)
+		if(strlen(nome) < 3 || strstr(nome, "0123456789") != NULL)
 			printf("Nome invalido. ");
-	}while(strlen(nome)< 3);
+	}while(strlen(nome)< 3 || strstr(nome, "0123456789") != NULL);
 	system("cls");
 }
 
@@ -539,9 +539,9 @@ void listaAtores(const char *arq_nome_atores)
 	free(atores);
 }
 
-//Objetivo : 
-//Parametro: 
-//Retorno  : 
+//Objetivo : Imprime os atores em ordem alfabética
+//Parametro: Vetor com atores em ordem alfabética
+//Retorno  : Sem retorno
 void imprimeOrdem(Atores *atores, int ordem, int nro_atores)
 {
 	//Declarações
@@ -665,6 +665,8 @@ void imprimeProfissao(Atores *atores, int nro_atores)
 	
 }
 
+
+//==============================================DELETAR ATORES======================================================
 //Objetivo : 
 //Parametro: 
 //Retorno  : 
