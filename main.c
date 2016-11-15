@@ -199,7 +199,7 @@ void mainAtores()
 				system("cls");
 				break;
 			case '3':
-				//listaAtores(nome_arq_atores);
+				listaAtores(nome_arq_atores);
 				system("cls");
 				break;
 			//case '4':
@@ -271,7 +271,7 @@ void cadastraAtores(const char *arq_nome_atores)
 			opcao = getch();
 		}while(!validaOpcaoAtoresCadastro(opcao));
 		system("cls");
-	}while(opcao != 'N');
+	}while(toupper(opcao) != 'N');
 
 }
 
@@ -393,13 +393,25 @@ void editaAtores(const char *arq_nome_atores)
 	FILE *arq_atores;
 	char opcao;
 	Atores ator;
-	int matricula = 0, aux = 0, contador = 0, valida = 0;
+	int matricula = 0, aux = 0, contador = 0, valida = 0, nro_atores = 1;
 	
 	//Instruções
 	imprimeMenusAtores('e');
+	
+	nro_atores = achaNroAtores(arq_nome_atores);
+	
+	imprimeMenusAtores('e');
+	if(!nro_atores)
+	{
+		printf("\nNão existe nem uma pessoa cadastrada!\n");
+		system("pause");
+		system("cls");
+		return;
+	}
+	
 	do
 	{
-		printf("Digite a matrícula da pessoa que deseja eeditar: ");
+		printf("Digite a matrícula da pessoa que deseja editar: ");
 		valida = scanf("%d", &matricula);
 		fflush(stdin);
 		if(!valida || !temMatriculaIgualAtor(matricula, arq_nome_atores) || temMatriculaIgualAtor(matricula, arq_nome_atores) != -1)
@@ -410,7 +422,6 @@ void editaAtores(const char *arq_nome_atores)
 	system("cls");
 	
 	imprimeMenusAtores('e');
-	
 	
 	while(!contador)
 	{
@@ -468,6 +479,191 @@ void editaAtores(const char *arq_nome_atores)
 	
 }
 
+//============================================LISTAGEM ATORES===================================================
+//Objetivo : Listar os atores
+//Parametro: Nome do arquivo contendo todos os atores
+//Retorno  : Sem retorno
+void listaAtores(const char *arq_nome_atores)
+{
+	//Declarações funções
+	void organizaAtores(Atores *atores, int inicio, int fim);
+	int validaOpcaoAtoresListar(int opcao);
+	void imprimeOrdem(Atores *atores, int ordem, int nro_atores);
+	void imprimeProfissao(Atores *atores, int nro_atores);
+	
+	//Declarações variáveis
+	FILE *arq_atores;
+	int nro_atores = 0;
+	Atores *atores;
+	char opcao;
+	
+	//Instruções
+	nro_atores = achaNroAtores(arq_nome_atores);
+	
+	imprimeMenusAtores('l');
+	if(nro_atores == 0)
+	{
+		printf("Nenhuma pessoa cadastrada!\n");
+		system("pause");
+		system("cls");
+		return;
+	}
+	
+	atores = malloc(sizeof(Atores) * nro_atores);
+	
+	arq_atores = abreArquivo("rb", arq_nome_atores);
+	fread(atores, sizeof(Atores), nro_atores, arq_atores);
+	fechaArquivo(arq_atores);
+	
+	
+	
+	do
+	{
+		printf("Escolha opção de listagem:\n1-Ordem Alfabética\n2-De Z à A\n3-Profissão\n0-Voltar ao menu anterior\nDigite a opção: ");
+		opcao = getche();
+	}while(!validaOpcaoAtoresListar(opcao));
+	system("cls");
+	
+	switch(opcao)
+	{
+		case '1':
+			imprimeOrdem(atores, 0, nro_atores);
+			break;
+		case '2':
+			imprimeOrdem(atores, 1, nro_atores);
+			break;
+		case '3':
+			imprimeProfissao(atores, nro_atores);
+	}
+	system("cls");
+	free(atores);
+}
+
+//Objetivo : 
+//Parametro: 
+//Retorno  : 
+void imprimeOrdem(Atores *atores, int ordem, int nro_atores)
+{
+	//Declarações
+	int aux, opcao = 0, valida = 0, aux2;
+	char opcao1;
+	
+	//Instuções
+	
+	//Se for 0 ordem alfabética se for 1 de A-Z
+	aux2 = ((!ordem)? nro_atores : 0);
+	do
+	{
+		imprimeMenusAtores('l');
+		if(!ordem)
+		{
+			for(aux = 0; aux != nro_atores; aux++)
+			{
+				printf("\n%d- %s /", aux+1, strupr(atores[aux].nome));
+				imprimeProfissaoAtor(atores[aux].profissao);
+			}
+		}
+		else
+		{
+			for(aux = nro_atores; aux != 0; aux--)
+			{
+				printf("\n%d- %s /", (nro_atores - aux) + 1, strupr(atores[aux].nome));
+				imprimeProfissaoAtor(atores[aux].profissao);
+			}
+		}
+		
+		printf("\n0-Voltar ao menu anterior\n");
+		do
+		{
+			printf("Digite o número correspondente à opção: ");
+			valida = scanf("%d", &opcao);
+			fflush(stdin);
+			if(!valida || opcao < 0 && opcao > nro_atores)
+			{
+				printf("Opção inválida! ");
+			}
+		}while(!valida || opcao < 0 && opcao > nro_atores);
+		
+		system("cls");
+		if(opcao == 0)
+		{
+			return;
+		}
+		
+		imprimeMenusAtores('l');
+		
+		printf("NOME: %s\nMATRICULA: %d\nIDADE: %d\n PROFISSAO: ", atores[opcao-1].nome, atores[opcao-1].matricula, atores[opcao-1].idade);
+		imprimeProfissaoAtor(atores[opcao-1].profissao);
+		printf("\nFILMES FEITOS: %s\nNACIONALIDADE: %s\n", atores[opcao-1].filmes_feitos, atores[opcao-1].nacionalidade);
+		
+		printf("Digite 'S' para voltar e listar outra pessoa ou qualquer outra tecla para continuar: ");
+		opcao1 = getch();
+		system("cls");
+		
+	}while(toupper(opcao1) == 'S');
+}
+
+//Objetivo : 
+//Parametro: 
+//Retorno  : 
+void imprimeProfissao(Atores *atores, int nro_atores)
+{
+	//Declarações
+	int profissao, aux, posicao = 0, opcao = 0, valida = 0;
+	char opcao1;
+	Atores atores_prof[nro_atores];
+	
+	//Instruções
+	imprimeMenusAtores('l');
+	
+	do
+	{
+		profissao = leProfissaoAtores();
+		system("cls");
+		
+		imprimeMenusAtores('l');
+		for( aux = 0 ; aux =! nro_atores; aux++)
+		{
+			if(atores[aux].profissao == profissao)
+			{
+				atores_prof[posicao] = atores[aux];
+				printf("\n%d- %s /", posicao+1, strupr(atores_prof[posicao].nome));
+				imprimeProfissaoAtor(atores_prof[posicao].profissao);
+				posicao++;
+			}
+		}
+		
+		printf("\n0-Voltar ao menu anterior\n");
+		do
+		{
+			printf("Digite o número correspondente à opção: ");
+			valida = scanf("%d", &opcao);
+			fflush(stdin);
+			if(!valida || opcao < 0 && opcao > posicao)
+			{
+				printf("Opção inválida! ");
+			}
+		}while(!valida || opcao < 0 && opcao > posicao);
+		
+		system("cls");
+		if(opcao == 0)
+		{
+			return;
+		}
+		
+		imprimeMenusAtores('l');
+		
+		printf("NOME: %s\nMATRICULA: %d\nIDADE: %d\n PROFISSAO: ", atores_prof[opcao-1].nome, atores_prof[opcao-1].matricula, atores_prof[opcao-1].idade);
+		imprimeProfissaoAtor(atores_prof[opcao-1].profissao);
+		printf("\nFILMES FEITOS: %s\nNACIONALIDADE: %s\n", atores[opcao-1].filmes_feitos, atores_prof[opcao-1].nacionalidade);
+		
+		
+		printf("Digite 'S' para voltar e listar outra pessoa ou qualquer outra tecla para continuar: ");
+		opcao1 = getch();
+		system("cls");
+	}while(toupper(opcao1) == 'S');
+	
+}
 
 //Objetivo : 
 //Parametro: 
@@ -483,13 +679,14 @@ void imprimeMenusAtores(char tipo)
 	'P' = menu principal dos atores
 	'C' = menu de cadastro de atores
 	'E' = menu de edição de atores
+	'L' = menu de listagem de atores
 	*/
 	
 	printf("PRINCIPAL/ATORES");
 	switch(toupper(tipo))
 	{
 		case 'P':
-			printf("\n____________________________________________________________________________________________________________________________\n");
+			printf("\n________________________________________________________________________________________________________________________\n");
 			printf("Escolha a opção que deseja entrar:\n1-Cadastrar\n2-Editar\n3-Listar\n4-Deletar\n0-Voltar ao menu anterior\nDigite uma opção: ");
 			return;
 		case 'C':
@@ -497,6 +694,9 @@ void imprimeMenusAtores(char tipo)
 			return;
 		case 'E':
 			printf("/EDITAR\n____________________________________________________________________________________________________________________\n");
+			return;
+		case 'L':
+			printf("/LISTAR\n____________________________________________________________________________________________________________________\n");
 	}
 }
 
@@ -587,11 +787,74 @@ void imprimeProfissaoAtor(int profissao)
 	}
 }
 
+//Objetivo : Organizar atores em ordem alfabética
+//Parametro: Vetor de atores, inicio do vetor, final do vetor
+//Retorno  : Sem retorno
+void organizaAtores(Atores *atores, int inicio, int fim)
+{
+	//Declarações
+	int aux, aux1;
+    char troca[ATORMAXNOME], troca2[ATORMAXNOME];
+    char troca_filmes[ATORMAXFILMES], troca_nacionalidade[ATORMAXNACIONALIDADE];
+    int troca_matricula, troca_profissao, troca_idade;
+
+	//Instruções
+    aux = inicio;
+    aux1 = fim;
+    strcpy(troca2, atores[(inicio + fim) / 2].nome);
+
+    while(aux <= aux1)
+        {
+        while(stricmp(atores[aux].nome, troca2) == -1 && aux < fim) {
+            aux++;
+        }
+        while(stricmp(atores[aux1].nome , troca2) == -1 && aux1 > inicio)
+        {
+            aux1--;
+        }
+        if(aux <= aux1)
+        {
+            strcpy(troca, atores[aux].nome);
+            strcpy(atores[aux].nome, atores[aux1].nome);
+            strcpy(atores[aux1].nome, troca);
+            
+            strcpy(troca_filmes, atores[aux].filmes_feitos);
+            strcpy(atores[aux].filmes_feitos, atores[aux1].filmes_feitos);
+            strcpy(atores[aux1].filmes_feitos, troca_filmes);
+            
+            troca_matricula = atores[aux].matricula;
+            atores[aux].matricula = atores[aux1].matricula;
+            atores[aux1].matricula = troca_matricula;
+            
+			troca_profissao = atores[aux].profissao;
+            atores[aux].profissao = atores[aux1].profissao;
+            atores[aux1].profissao = troca_profissao;
+            
+            strcpy(troca_filmes, atores[aux].filmes_feitos);
+            strcpy(atores[aux].filmes_feitos, atores[aux1].filmes_feitos);
+            strcpy(atores[aux1].filmes_feitos, troca_filmes);
+            
+            strcpy(troca, atores[aux].nome);
+            strcpy(atores[aux].nome, atores[aux1].nome);
+            strcpy(atores[aux1].nome, troca);
+            aux++;
+            aux1--;
+        }
+    }
+
+    if(aux1 > inicio) {
+        organizaAtores(atores, inicio, aux1);
+    }
+    if(aux < fim) {
+        organizaAtores(atores, aux1, fim);
+    }
+}
+
 //Objetivo : 
 //Parametro: 
 //Retorno  : 
 
-//============VALIDACOES==================
+//=======================================VALIDACOES=================================================================
 //Objetivo : Validar opção do menu principal de atores
 //Parametro: Opção
 //Retorno  : Situação da validação
@@ -662,6 +925,22 @@ int validaOpcaoAtoresEdita(int opcao)
 		return 0;
 	}
 	else 
+	{
+		return 1;
+	}
+}
+
+//Objetivo : Validar opção do menu atores listar
+//Parametro: Opção
+//Retorno  : Situação da validação
+int validaOpcaoAtoresListar(int opcao)
+{
+	if(opcao < 48 || opcao > 51)
+	{
+		printf("Opção inválida!\n");
+		return 0;
+	}
+	else
 	{
 		return 1;
 	}
