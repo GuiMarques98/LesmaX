@@ -417,7 +417,7 @@ void editaAtores(const char *arq_nome_atores)
 	
 	if(!nro_atores)
 	{
-		printf("\Nenhuma pessoa cadastrada!\n");
+		printf("\nNenhuma pessoa cadastrada!\n");
 		system("pause");
 		system("cls");
 		return;
