@@ -217,8 +217,8 @@ void mainAtores()
 				listaAtores(nome_arq_atores);
 				system("cls");
 				break;
-			//case '4':
-				//deletaAtores(nome_arq_atores);
+			case '4':
+				deletaAtores(nome_arq_atores);
 				system("cls");
 		}
 	}while(opcao != '0');
@@ -301,9 +301,9 @@ void leNomeAtores(char* nome)
 		fflush(stdin);
 		fgets(nome, ATORMAXNOME, stdin);
 		nome[strlen(nome)-1] = '\0';
-		if(strlen(nome) < 3)
+		if(strlen(nome) < 3 || strstr(nome, "0123456789") != NULL)
 			printf("Nome invalido. ");
-	}while(strlen(nome)< 3);
+	}while(strlen(nome)< 3 || strstr(nome, "0123456789") != NULL);
 	system("cls");
 }
 
@@ -334,7 +334,6 @@ int leIdadeAtores()
 int leProfissaoAtores()
 {
 	//Declarações
-	int valida;
 	char profissao;
 	
 	//Instruções
@@ -342,7 +341,7 @@ int leProfissaoAtores()
 	{
 		printf("Digite a opção correspondente à profissão:\n1-Ator\n2-Diretor\n3-Roteirista\n4-Produtor\nDigite a opção: ");
 		profissao = getch();
-	}while(valida || profissao < 49 && profissao > 52);//32561 se refere ao numero 1 com o getch e assim por diante ate o 21565 que se refere ao numero 5
+	}while(profissao < 49 && profissao > 52);//32561 se refere ao numero 1 com o getch e assim por diante ate o 21565 que se refere ao numero 5
 	
 	return profissao;
 }
@@ -393,6 +392,7 @@ int leMatriculaAtores(const char *arq_nome_atores)
 			printf("Matrícula inválida! ");	
 		}
 	}while(!valida || !validaMatricula(arq_nome_atores, matricula));
+	return matricula;
 }
 
 //============================================EDITA ATORES======================================================
@@ -415,10 +415,9 @@ void editaAtores(const char *arq_nome_atores)
 	
 	nro_atores = achaNroAtores(arq_nome_atores);
 	
-	imprimeMenusAtores('e');
 	if(!nro_atores)
 	{
-		printf("\nNão existe nem uma pessoa cadastrada!\n");
+		printf("\Nenhuma pessoa cadastrada!\n");
 		system("pause");
 		system("cls");
 		return;
@@ -447,9 +446,9 @@ void editaAtores(const char *arq_nome_atores)
 		
 		if(ator.matricula == matricula)
 		{
-			printf("1-NOME: %s\n2-IDADE: %d\n3-PROFISSÃO:");
+			printf("1-NOME: %s\n2-IDADE: %d\n3-PROFISSÃO:", ator.nome, ator.idade);
 			imprimeProfissaoAtor(ator.profissao);
-			printf("\n4-FILMES FEITOS: %s\n5-NACIONALIDADE: %s\n0-VOLTAR AO MENU PRINCIPAL\n");
+			printf("\n4-FILMES FEITOS: %s\n5-NACIONALIDADE: %s\n0-VOLTAR AO MENU PRINCIPAL\n", ator.filmes_feitos, ator.nacionalidade);
 			
 			do
 			{
@@ -554,9 +553,9 @@ void listaAtores(const char *arq_nome_atores)
 	free(atores);
 }
 
-//Objetivo : 
-//Parametro: 
-//Retorno  : 
+//Objetivo : Imprime os atores em ordem alfabética
+//Parametro: Vetor com atores em ordem alfabética
+//Retorno  : Sem retorno
 void imprimeOrdem(Atores *atores, int ordem, int nro_atores)
 {
 	//Declarações
@@ -647,6 +646,15 @@ void imprimeProfissao(Atores *atores, int nro_atores)
 				posicao++;
 			}
 		}
+		if(!posicao)
+		{
+			printf("Nenhuma pessoa com a profissao ");
+			imprimeProfissaoAtor(profissao);
+			printf(" encontrado!\n");
+			system("pause");
+			system("cls");
+			return;
+		}
 		
 		printf("\n0-Voltar ao menu anterior\n");
 		do
@@ -680,9 +688,94 @@ void imprimeProfissao(Atores *atores, int nro_atores)
 	
 }
 
-//Objetivo : 
-//Parametro: 
-//Retorno  : 
+
+//==============================================DELETAR ATORES======================================================
+//Objetivo : Deletar ator
+//Parametro: Nome do arquivo com todos os atores
+//Retorno  : Sem retorno
+void deletaAtores(const char *arq_nome_atores)
+{
+	//Declarações
+	int validaOpcaoAtoresDeletar(int opcao);
+	FILE *arq_substituto, *arq_atores;
+	const char arq_nome_substituto[] = "substituto.bin";
+	int matricula, nro_atores;
+	char opcao, nome[ATORMAXNOME];
+	int aux = 0, valida;
+	Atores ator;
+	
+	
+	//Instruções
+	imprimeMenusAtores('D');
+	nro_atores = achaNroAtores(arq_nome_atores);
+	if(!nro_atores)
+	{
+		printf("Nenhuma pessoa cadastrada!\n");
+		system("pause");
+		return;
+	}
+	//Este do while é para verificar se a matricula existe
+	do
+	{
+		printf("Digite a matrícula da pessoa que deseja excuir: ");
+		valida = scanf("%d", &matricula);
+		fflush(stdin);
+		if(!valida || !temMatriculaIgualAtor(matricula, arq_nome_atores) || temMatriculaIgualAtor(matricula, arq_nome_atores) != -1)
+		{
+			printf("Matrícula não encontrada! ");	
+		}
+	}while(!valida || !temMatriculaIgualAtor(matricula, arq_nome_atores) || temMatriculaIgualAtor(matricula, arq_nome_atores) != -1);
+	system("cls");
+	
+	imprimeMenusAtores('D');
+	arq_substituto = abreArquivo("a+b", arq_nome_substituto);
+	arq_atores = abreArquivo("r+b", arq_nome_atores);
+	
+	while(!(feof(arq_atores)))
+	{
+		fread(&ator, sizeof(Atores), 1, arq_atores);
+		if(ator.matricula == matricula)
+		{
+			printf("1-NOME: %s\n2-IDADE: %d\n3-PROFISSÃO:", ator.nome, ator.idade);
+			imprimeProfissaoAtor(ator.profissao);
+			printf("\n4-FILMES FEITOS: %s\n5-NACIONALIDADE: %s", ator.filmes_feitos, ator.nacionalidade);
+			do
+			{
+				printf("Deseja excluir a pessoa %s ? 'S' para sim e 'N' para não. ");
+				opcao = getch();
+			}while(!validaOpcaoAtoresDeletar(opcao));
+			system("cls");
+			if(toupper(opcao) == 'S')
+			{
+				strcpy(nome, ator.nome);
+				aux++;
+			}
+			else
+			{
+				fwrite(&ator, sizeof(Atores), 1, arq_substituto);
+				aux++;
+			}
+		}
+		else
+		{
+			fwrite(&ator, sizeof(Atores), 1, arq_substituto);
+			aux++;
+		}
+	}
+	
+	fechaArquivo(arq_substituto);
+	fechaArquivo(arq_atores);
+	
+	if(!remove(arq_nome_atores) && toupper(opcao) == 'S')
+	{
+		rename(arq_nome_substituto, arq_nome_atores);
+		printf("%s apagado com sucesso!\n\n", strupr(nome));
+		system("pause");
+		system("cls");
+		return;
+	}
+	
+}
 
 //============================================OUTRASFUNCOES=====================================================
 //Objetivo : Imprime as opções de cadastro referente so menu
@@ -695,6 +788,7 @@ void imprimeMenusAtores(char tipo)
 	'C' = menu de cadastro de atores
 	'E' = menu de edição de atores
 	'L' = menu de listagem de atores
+	'D' = menu de listagem de atores
 	*/
 	
 	printf("PRINCIPAL/ATORES");
@@ -712,6 +806,10 @@ void imprimeMenusAtores(char tipo)
 			return;
 		case 'L':
 			printf("/LISTAR\n____________________________________________________________________________________________________________________\n");
+			return;
+		case 'D':
+			printf("/DELETAR\n_________________________________________________________________________________________________________________________\n");
+			return;
 	}
 }
 
@@ -962,10 +1060,23 @@ int validaOpcaoAtoresListar(int opcao)
 	}
 }
 
-//Objetivo : 
-//Parametro: 
-//Retorno  : 
-
+//Objetivo : Validar opção do menu atores deletar
+//Parametro: Opção
+//Retorno  : Situação da validação
+int validaOpcaoAtoresDeletar(int opcao)
+{
+	opcao = toupper(opcao);
+	if(opcao != 83 && opcao != 78)
+	{
+		printf("Opção inválida!\n");
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}	
+	
+}
 //===================================FILMES==========================================
 
 
